@@ -1,0 +1,52 @@
+name: LinkedIn DevOps Bot
+
+on:
+  schedule:
+    # Post 1 — 8:00 AM IST = 2:30 AM UTC  (Mon–Fri)
+    - cron: "30 2 * * 1-5"
+    # Post 2 — 10:30 AM IST = 5:00 AM UTC
+    - cron: "0 5 * * 1-5"
+    # Post 3 — 1:00 PM IST = 7:30 AM UTC
+    - cron: "30 7 * * 1-5"
+    # Post 4 — 3:30 PM IST = 10:00 AM UTC
+    - cron: "0 10 * * 1-5"
+    # Post 5 — 6:00 PM IST = 12:30 PM UTC
+    - cron: "30 12 * * 1-5"
+
+  workflow_dispatch:          # Manual "Run workflow" button in GitHub UI
+    inputs:
+      topic:
+        description: "Topic to post (cicd / kubernetes / project / debug / charts_code / random)"
+        required: false
+        default: "random"
+      dry_run:
+        description: "Dry run? (true = print post, don't publish)"
+        required: false
+        default: "false"
+
+jobs:
+  post:
+    name: Generate & publish LinkedIn post
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run bot
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN:    ${{ secrets.LINKEDIN_PERSON_URN }}
+          POST_TOPIC:             ${{ github.event.inputs.topic || 'auto' }}
+          DRY_RUN:                ${{ github.event.inputs.dry_run || 'false' }}
+        run: python bot.py
