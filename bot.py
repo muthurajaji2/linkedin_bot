@@ -35,7 +35,7 @@ LINKEDIN_PERSON_URN   = os.environ.get("LINKEDIN_PERSON_URN", "")
 DRY_RUN               = os.environ.get("DRY_RUN", "false").lower() == "true"
 FORCE_TOPIC           = os.environ.get("POST_TOPIC", "auto").lower()
 
-CLAUDE_MODEL   = "claude-sonnet-4-20250514"
+CLAUDE_MODEL   = "claude-sonnet-4-6"
 LINKEDIN_URL   = "https://api.linkedin.com/v2/ugcPosts"
 
 logging.basicConfig(
